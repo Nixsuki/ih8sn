@@ -84,7 +84,6 @@ int main(int argc, char *argv[]) {
     const auto build_type = config.find("BUILD_TYPE");
     const auto build_version_release = config.find("BUILD_VERSION_RELEASE");
     const auto build_version_release_or_codename = config.find("BUILD_VERSION_RELEASE_OR_CODENAME");
-    const auto debuggable = config.find("DEBUGGABLE");
     const auto manufacturer_name = config.find("MANUFACTURER_NAME");
     const auto product_brand = config.find("PRODUCT_BRAND");
     const auto product_device = config.find("PRODUCT_DEVICE");
@@ -147,14 +146,31 @@ int main(int argc, char *argv[]) {
     if (is_init_stage && product_name != config.end()) {
         property_override(property_list("ro.product.", "name"), product_name->second.c_str());
     }
+    
+    if (is_init_stage && secure != config.end()) {
+        property_override("ro.secure", secure->second.c_str());
+    }
 
     if (is_boot_completed_stage) {
-        property_override("ro.boot.flash.locked", "1");
         property_override("ro.boot.vbmeta.device_state", "locked");
+        property_override("ro.boot.vbmeta.invalidate_on_error", "yes");
+        property_override("ro.boot.vbmeta.avb_version", "1.0");
+        property_override("ro.boot.vbmeta.hash_alg", "sha256");
+        property_override("ro.boot.vbmeta.size", "4096");
+        property_override("ro.adb.secure", "1");
         property_override("ro.boot.verifiedbootstate", "green");
+        property_override("ro.boot.flash.locked", "1");
         property_override("ro.boot.veritymode", "enforcing");
         property_override("ro.boot.warranty_bit", "0");
-        property_override("ro.warranty_bit", "0");
+        property_override("ro.debuggable", "0");
+        property_override("ro.force.debuggable", "0");
+        property_override("ro.secure", "1");
+        property_override("ro.vendor.boot.warranty_bit", "0");
+        property_override("ro.vendor.warranty_bit", "0");
+        property_override("ro.secureboot.lockstate", "locked");
+        property_override("sys.oem_unlock_allowed", "0");
+        property_override("vendor.boot.vbmeta.device_state", "locked");
+        property_override("vendor.boot.verifiedbootstate", "green");
     }
 
     return 0;
